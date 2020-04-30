@@ -100,4 +100,56 @@ class Orang:
         #menghitung jarak antar individu.
         return math.sqrt((org.x_pos-x)**2+(org.y_pos-y)**2)
 
+#MAIN PROGRAM
+n = 200  #Jumlah orang
+p_infected = 5  #presentasi jumlah orang yang terinfeksi 
+r_spread = 2  #radius transmisi virus
+prob_spread = 4  #kemungkinan transmisi
+prob = 80  #probabilitas individu bergerak
+t_recovery = 10   #hari untuk sembuh
 
+
+spread=0
+arr_orang=[]
+
+#membuat individu dan bergerak secara random walk positions. menginfeksi populasi
+for i in range(n):
+    p = Orang(i,np.random.random()*20, np.random.random()*20,np.random.random() * 20, np.random.random() * 20,t_recovery, False)
+
+    if np.random.random()<p_infected/100:
+        p.infect(0)
+        spread=spread+1
+    if np.random.random()>prob/100:
+        p.permanent=True
+
+    arr_orang.append(p)
+
+
+#membuat grafik plot
+fig = plt.figure(figsize=(18,9))
+ax = fig.add_subplot(1,2,1)
+cx = fig.add_subplot(1,2,2)
+
+#gambar penyebaran 
+ax.axis([0,20,0,20])
+#gambar kurva
+cx.axis([0,50,0,200])
+scatt=ax.scatter([p.x_pos for p in arr_orang],[p.y_pos for p in arr_orang],c='blue',s=8)
+
+#membuat box
+kotak = plt.Rectangle((0,0),100,100,fill=False)
+ax.add_patch(kotak)
+
+#memberikan warna plot
+gambar1,=cx.plot(spread,color="red",label="Terinfeksi")
+gambar2,=cx.plot(spread,color="green",label="Sembuh")
+cx.legend(handles=[gambar2,gambar1])
+
+#label pada plot kurva
+cx.set_xlabel("Hari")
+cx.set_ylabel("Populasi")
+
+#membuat array
+st=[spread]
+rt=[0]
+t=[0]
