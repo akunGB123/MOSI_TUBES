@@ -153,3 +153,62 @@ cx.set_ylabel("Populasi")
 st=[spread]
 rt=[0]
 t=[0]
+
+#update posisi
+def update(frame,rt,st,t):
+    infek = 0
+    reco = 0
+    colour = []
+    sizes = [8 for iter1 in arr_orang]
+    for iter1 in arr_orang :
+        #Cek jumlah orang yang terinfeksi
+        iter1.checkSpread(frame)
+        #animasi gerak orang
+        iter1.updatePos(0,0)
+        if iter1.removed:
+            reco=reco+1 
+            #menghitung yang sembuh
+        if iter1.infected:
+            infek=infek+1 
+            #menghitung yang terifeksi
+            #cek jika virus menyebar
+            for iter2 in arr_orang:
+                if iter2.index==iter1.index or iter2.infected or iter2.removed:
+                    pass
+                else:
+                    d=iter1.getDistance(iter2.x_pos,iter2.y_pos)
+                    if d<r_spread:
+                        if np.random.random() < prob_spread / 100:
+                            iter2.infect(frame)
+                            sizes[iter2.index]=80
+        colour.append(iter1.setColor())
+
+    print("Day -",frame)
+    print("Infected = ",infek)
+    print("Recovery = ",reco)
+    print()
+
+    #update data 
+    st.append(infek)
+    rt.append(reco)
+    t.append(frame)
+
+    #memplot ke matplotlib
+    offsets=np.array([[iter1.x_pos for iter1 in arr_orang],[iter1.y_pos for iter1 in arr_orang]])
+    scatt.set_offsets(np.ndarray.transpose(offsets))
+    scatt.set_color(colour)
+    scatt.set_sizes(sizes)
+    gambar1.set_data(t,st)
+    gambar2.set_data(t,rt)
+    return scatt,gambar1,gambar2
+
+#Animasi
+animation = FuncAnimation(fig, update, interval=50,fargs=(rt,st,t),blit=True)
+
+plt.show()
+
+i = 1
+while st[i] != 0:  
+    i += 1
+
+print("Everyone cured in day -",t[i])
